@@ -14,4 +14,4 @@ This is a Python 3 script that extracts Windows 10 lock screen images
 
 ## Usage
 
-    python3 win10_lockscreen_extract.py
+    python3 main.py
