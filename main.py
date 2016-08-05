@@ -1,6 +1,7 @@
 import sys
 import os
 import platform
+from PIL import Image
 import shutil
 
 err_msg = 'This system is not Windows 10. Exit.'
@@ -22,9 +23,17 @@ list_files = os.listdir(src_path)
 cnt = 0
 for fname in list_files:
     src_file = src_path + fname
-    fsize = os.path.getsize(src_file) / 1024  # KB
-    if fsize < 400:  # temporary threshold
+    try:
+        im = Image.open(src_file)
+    except OSError:
         continue
+    dim = im.size
+    dim = sorted(dim)
+    if dim != [1080, 1920]:
+        continue
+    # fsize = os.path.getsize(src_file) / 1024  # KB
+    # if fsize < 400:  # temporary threshold
+    #     continue
     dst_file = dst_path + fname + '.jpg'
     if os.path.isfile(dst_file):
         continue
