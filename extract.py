@@ -44,11 +44,10 @@ def main():
             continue
         (x, y) = im.size
         im.close()
-        if x == 1920 and y == 1080:
-            if not check_already_copied(fname, copied_files):
+        if not check_already_copied(fname, copied_files):
+            if x == 1920 and y == 1080:
                 list_land += [fname]
-        if x == 1080 and y == 1920:
-            if not check_already_copied(fname, copied_files):
+            if x == 1080 and y == 1920:
                 list_port += [fname]
     print('Landscape:', list_land)
     print('Portrait: ', list_port)
