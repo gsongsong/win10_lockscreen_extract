@@ -5,6 +5,7 @@ import numpy as np
 import scipy.misc as misc
 from PIL import Image
 import shutil
+import func
 
 
 def check_already_copied(fname, copied_files):
@@ -15,13 +16,7 @@ def check_already_copied(fname, copied_files):
 
 
 def main():
-    err_msg = 'This system is not Windows 10. Exit.'
-    if sys.platform != 'win32':
-        print(err_msg)
-        exit()
-    if platform.release() != '10':
-        print(err_msg)
-        exit()
+    func.check_os()
 
     # APPDATA = os.getenv('APPDATA') # ApppData/Roaming
     src_path = os.path.expanduser('~/AppData/Local/Packages/Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy/'
