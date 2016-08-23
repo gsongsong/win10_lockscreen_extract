@@ -1,5 +1,6 @@
 import os
 from PIL import Image
+import git
 from git import Repo
 import func
 
@@ -34,16 +35,28 @@ def main():
                     '<title>Windows 10 Lockscreens</title>'
                     '</head>'
                     '<div style="text-align:center;">'
-                    '<h1>Windows 10 Lockscreens</h1>')
+                    '<h1>Windows 10 Lockscreens</h1>\n')
     cnt = 1
     for fname in thumb_files:
         html_file.write('<a href=' + fname + '>'
-                        '<img src=thumbnails/' + fname + '> '
-                        '</a>')
+                        '<img src=thumbnails/' + fname + '>'
+                        '</a>\n')
         cnt += 1
         if cnt % 2:
-            html_file.write('<br />')
+            html_file.write('<br />\n')
     html_file.write('</div>')
+    html_file.close()
+
+    repo = Repo(src_path)
+    repo.git.add('.')
+    try:
+        repo.git.commit('-m updated')
+    except git.exc.GitCommandError:
+        print('Nothing to commit. Exit.')
+        exit()
+    else:
+        origin = repo.remote('origin')
+        origin.push()
 
 if __name__ == "__main__":
     main()
