@@ -37,8 +37,8 @@ def main():
                     '<h1>Windows 10 Lockscreens</h1>')
     cnt = 1
     for fname in thumb_files:
-        html_file.write('<a href=' + src_path + fname + '>'
-                        '<img src=' + thumb_path + fname + '> '
+        html_file.write('<a href=' + fname + '>'
+                        '<img src=thumbnails/' + fname + '> '
                         '</a>')
         cnt += 1
         if cnt % 2:
