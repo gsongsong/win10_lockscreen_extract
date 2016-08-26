@@ -7,13 +7,14 @@ import func
 
 def main():
     func.check_os()
-    src_path = os.path.expanduser('~/Pictures/win10_lockscreen/')
+    git_path = os.path.expanduser('~/Pictures/win10_lockscreen/')
+    src_path = git_path + 'images/'
     if not os.path.isdir(src_path):
         print('Repository does not exist. Exit.')
         exit()
     original_files = [f for f in os.listdir(src_path) if f.endswith('.jpg')]
 
-    thumb_path = src_path + 'thumbnails/'
+    thumb_path = git_path + 'thumbnails/'
     if not os.path.isdir(thumb_path):
         print('Thumbnail folder does not exist. Create new one.')
         os.mkdir(thumb_path)
@@ -30,24 +31,52 @@ def main():
         im.save(thumb_path + fname, 'JPEG')
         thumb_files += [fname]
 
-    html_file = open(src_path + 'index.html', 'w')
-    html_file.write('<head>'
-                    '<title>Windows 10 Lockscreens</title>'
-                    '</head>'
-                    '<div style="text-align:center;">'
-                    '<h1>Windows 10 Lockscreens</h1>\n')
+    html_file = open(git_path + 'index.html', 'w')
+    html_file.write('''<head>
+<title>Windows 10 Lockscreens</title>
+<script src="js/jquery-3.1.0.min.js"></script>
+<script src="js/jquery.lazyload.js"></script>
+<style>
+a {
+    text-decoration: none;
+}
+</style>
+</head>
+<div style="text-align:center;">
+<h1>Windows 10 Lockscreens</h1>
+<ul style="list-style-type: none;">
+''')
     cnt = 1
     for fname in thumb_files:
-        html_file.write('<a href=' + fname + '>'
-                        '<img src=thumbnails/' + fname + '>'
-                        '</a>\n')
+        if cnt % 2:
+            html_file.write('''    <li>
+''')
+
+        if 'land' in fname:
+            w = 480
+        if 'port' in fname:
+            w = 151
+        html_file.write('''        <a href=images/%s>
+            <img class=lazy data-original=thumbnails/%s width=%s height=270>
+        </a>
+''' % (fname, fname, w))
+
         cnt += 1
         if cnt % 2:
-            html_file.write('<br />\n')
-    html_file.write('</div>')
+            html_file.write('''</li>
+<li>
+''')
+    html_file.write('''</ul>
+</div>
+<script>
+$(function() {
+    $('img.lazy').lazyload();
+});
+</script>
+''')
     html_file.close()
 
-    repo = Repo(src_path)
+    repo = Repo(git_path)
     repo.git.add('.')
     try:
         repo.git.commit('-m updated')
