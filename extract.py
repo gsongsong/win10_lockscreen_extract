@@ -21,7 +21,7 @@ def main():
     # APPDATA = os.getenv('APPDATA') # ApppData/Roaming
     src_path = os.path.expanduser('~/AppData/Local/Packages/Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy/'
                                   'LocalState/Assets/')
-    dst_path = os.path.expanduser('~/Pictures/win10_lockscreen/')
+    dst_path = os.path.expanduser('~/Pictures/win10_lockscreen/images/')
     if not os.path.isdir(dst_path):
         print('Destination folder does not exist. Create new one.')
         os.mkdir(dst_path)
