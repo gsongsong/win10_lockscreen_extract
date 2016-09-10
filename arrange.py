@@ -3,6 +3,13 @@ from PIL import Image, ImageChops
 import numpy as np
 
 
+def cosine2d(a, b):
+    dot_prod = np.sum(np.multiply(a, b))
+    norm1 = np.sqrt(np.sum(a ** 2))
+    norm2 = np.sqrt(np.sum(b ** 2))
+    return dot_prod / norm1 / norm2
+
+
 def main():
     # path = os.path.expanduser('~/Pictures/win10_lockscreen/')
     path = os.path.expanduser('~/Desktop/tmp/')
@@ -24,14 +31,7 @@ def main():
                 # confusion_matrix[idx1, idx2] = np.max(im1.size, im2.size)
                 confusion_matrix[idx1, idx2] = 0
                 continue
-            # diff = np.abs(im1 - im2)
-            # dist = np.sum(diff) / im1.size / 3
-            # confusion_matrix[idx1, idx2] = dist
-            dot_prod = np.sum(np.multiply(im1, im2))
-            norm1 = np.sqrt(np.sum(im1 ** 2))
-            norm2 = np.sqrt(np.sum(im2 ** 2))
-            sim = dot_prod / norm1 / norm2
-            confusion_matrix[idx1, idx2] = sim
+            confusion_matrix[idx1, idx2] = cosine2d(im1, im2)
     print(confusion_matrix)
 
 if __name__ == "__main__":
