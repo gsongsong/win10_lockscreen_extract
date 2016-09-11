@@ -44,6 +44,7 @@ def main():
                 list_land += [fname]
             if x == 1080 and y == 1920:
                 list_port += [fname]
+    print('Following new items will be copied:')
     print('Landscape:', list_land)
     print('Portrait: ', list_port)
 
@@ -76,6 +77,7 @@ def main():
         err_all = np.delete(err_all, arg_port, 1)
 
     print('Copied', cnt, 'pair(s)')
+    return cnt
 
 if __name__ == "__main__":
     main()

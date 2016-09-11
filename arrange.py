@@ -2,6 +2,7 @@ import os
 from PIL import Image, ImageChops
 import numpy as np
 import shutil
+import func
 
 
 def cosine2d(a, b):
@@ -33,7 +34,7 @@ def build_confusionmatrix(path, files):
     return confusion_matrix
 
 
-def arrange_duplicates(img_path, thumb_path, list_land, list_port, confusion_matrix):
+def arrange_duplicates(img_path, list_land, list_port, confusion_matrix):
     for idx1, file_land1 in enumerate(list_land):
         n = np.argmax(confusion_matrix[idx1, :])
         file_land2 = list_land[n]
@@ -45,21 +46,20 @@ def arrange_duplicates(img_path, thumb_path, list_land, list_port, confusion_mat
             smaller_file_land = file_land1 if size1 < size2 else file_land2
             smaller_file_port = file_port1 if size1 < size2 else file_port2
             shutil.move(img_path + smaller_file_land, img_path + 'dups/' + smaller_file_land)
-            shutil.move(thumb_path + smaller_file_land, thumb_path + 'dups/' + smaller_file_land)
             shutil.move(img_path + smaller_file_port, img_path + 'dups/' + smaller_file_port)
-            shutil.move(thumb_path + smaller_file_port, thumb_path + 'dups/' + smaller_file_port)
 
 
 def main():
+    func.check_os()
     path = os.path.expanduser('~/Pictures/win10_lockscreen/')
     img_path = path + 'images/'
-    thumb_path = path + 'thumbnails/'
 
     files = [f for f in os.listdir(img_path) if f.endswith('.jpg')]
     list_land = [f for f in files if 'land' in f]
     list_port = [f for f in files if 'port' in f]
-    confusion_matrix = build_confusionmatrix(thumb_path, list_land)
-    arrange_duplicates(img_path, thumb_path, list_land, list_port, confusion_matrix)
+    print('Building confusion matrix...')
+    confusion_matrix = build_confusionmatrix(img_path, list_land)
+    arrange_duplicates(img_path, list_land, list_port, confusion_matrix)
 
 if __name__ == "__main__":
     main()

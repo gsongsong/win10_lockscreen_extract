@@ -2,6 +2,7 @@ import extract
 import arrange
 import publish
 
-extract.main()
-arrange.main()
-publish.main()
+if __name__ == "__main__":
+    if extract.main():
+        arrange.main()
+    publish.main()
