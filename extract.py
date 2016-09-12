@@ -70,6 +70,8 @@ def main():
                         dst_path + list_land[arg_land] + '-land-' + list_port[arg_port] + '.jpg')
         shutil.copyfile(src_path + list_port[arg_port],
                         dst_path + list_land[arg_land] + '-port-' + list_port[arg_port] + '.jpg')
+        print(list_land[arg_land])
+        print(list_port[arg_port])
         cnt += 1
 
         del list_land[arg_land], list_port[arg_port]
