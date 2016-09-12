@@ -3,6 +3,11 @@ from PIL import Image, ImageChops
 import numpy as np
 import shutil
 import func
+import git
+
+
+def filter(item_list, keyword):
+    return [i for i in item_list if keyword in i]
 
 
 def cosine2d(a, b):
@@ -12,34 +17,35 @@ def cosine2d(a, b):
     return dot_prod / norm1 / norm2
 
 
-def build_confusionmatrix(path, files):
-    n = len(files)
-    confusion_matrix = np.zeros((n, n))
-    for idx1, f1 in enumerate(files):
-        print(idx1 + 1, '/', n)
+def build_confusionmatrix(path, new_files, old_files):
+    files_all = new_files + old_files
+    n = len(new_files)
+    m = len(files_all)
+    confusion_matrix = np.zeros((n, m))
+    for idx1, f1 in enumerate(new_files):
+        print(idx1 + 1, '/', n, 'vs', m)
         im1 = np.array(Image.open(path + f1)).astype(int) / 255
-        for idx2, f2 in enumerate(files):
+        for idx2, f2 in enumerate(files_all):
+            print(idx2 + 1, end='')
             if idx2 < idx1:
-                confusion_matrix[idx1, idx2] = -1
-                continue
-            if f1 == f2:
                 confusion_matrix[idx1, idx2] = -1
                 continue
             im2 = np.array(Image.open(path + f2)).astype(int) / 255
             if im1.shape != im2.shape:
-                # confusion_matrix[idx1, idx2] = np.max(im1.size, im2.size)
                 confusion_matrix[idx1, idx2] = 0
                 continue
             confusion_matrix[idx1, idx2] = cosine2d(im1, im2)
     return confusion_matrix
 
 
-def arrange_duplicates(img_path, list_land, list_port, confusion_matrix):
-    for idx1, file_land1 in enumerate(list_land):
+def arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land, old_files_port, confusion_matrix):
+    files_all_land = new_files_land + old_files_land
+    files_all_port = new_files_port + old_files_port
+    for idx1, file_land1 in enumerate(new_files_land):
         n = np.argmax(confusion_matrix[idx1, :])
-        file_land2 = list_land[n]
-        file_port1 = list_port[idx1]
-        file_port2 = list_port[n]
+        file_port1 = new_files_port[idx1]
+        file_land2 = files_all_land[n]
+        file_port2 = files_all_port[n]
         if confusion_matrix[idx1, n] > 0.98:
             size1 = os.path.getsize(img_path + file_land1)
             size2 = os.path.getsize(img_path + file_land2)
@@ -54,12 +60,18 @@ def main():
     path = os.path.expanduser('~/Pictures/win10_lockscreen/')
     img_path = path + 'images/'
 
-    files = [f for f in os.listdir(img_path) if f.endswith('.jpg')]
-    list_land = [f for f in files if 'land' in f]
-    list_port = [f for f in files if 'port' in f]
+    repo = git.Repo(path)
+    old_files = [e[0] for e in repo.index.entries if e[0].startwith('images/') and e[0].endwith('.jpg')]
+    old_files_land = filter(old_files, 'land')
+    old_files_port = filter(old_files, 'port')
+    new_files = [f for f in repo.untracked_files if f.startswith('images/') and f.endswith('.jpg')]
+    new_files_land = filter(new_files, 'land')
+    new_files_port = filter(new_files, 'port')
+    print(len(new_files_land), 'new pair(s) will be compared with', len(old_files_land), 'old pair(s)')
     print('Building confusion matrix...')
-    confusion_matrix = build_confusionmatrix(img_path, list_land)
-    arrange_duplicates(img_path, list_land, list_port, confusion_matrix)
+    confusion_matrix = build_confusionmatrix(img_path, new_files_land, old_files_land)
+    print('Arranging files in the folder...')
+    arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land, old_files_port, confusion_matrix)
 
 if __name__ == "__main__":
     main()
