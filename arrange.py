@@ -23,10 +23,14 @@ def build_confusionmatrix(path, new_files, old_files):
     m = len(files_all)
     confusion_matrix = np.zeros((n, m))
     for idx1, f1 in enumerate(new_files):
-        print(idx1 + 1, '/', n, 'vs', m)
         im1 = np.array(Image.open(path + f1)).astype(int) / 255
         for idx2, f2 in enumerate(files_all):
-            print(idx2 + 1, end='')
+            if idx2 % 100 == 99:
+                print('+', end='')
+            elif idx2 % 10 == 9:
+                print('-', end='')
+            else:
+                print('.', end='')
             if idx2 < idx1:
                 confusion_matrix[idx1, idx2] = -1
                 continue
@@ -35,6 +39,7 @@ def build_confusionmatrix(path, new_files, old_files):
                 confusion_matrix[idx1, idx2] = 0
                 continue
             confusion_matrix[idx1, idx2] = cosine2d(im1, im2)
+        print('')
     return confusion_matrix
 
 
@@ -61,10 +66,10 @@ def main():
     img_path = path + 'images/'
 
     repo = git.Repo(path)
-    old_files = [e[0] for e in repo.index.entries if e[0].startwith('images/') and e[0].endwith('.jpg')]
+    old_files = [e[0][7:] for e in repo.index.entries if e[0].startswith('images/') and e[0].endswith('.jpg')]
     old_files_land = filter(old_files, 'land')
     old_files_port = filter(old_files, 'port')
-    new_files = [f for f in repo.untracked_files if f.startswith('images/') and f.endswith('.jpg')]
+    new_files = [f[7:] for f in repo.untracked_files if f.startswith('images/') and f.endswith('.jpg')]
     new_files_land = filter(new_files, 'land')
     new_files_port = filter(new_files, 'port')
     print(len(new_files_land), 'new pair(s) will be compared with', len(old_files_land), 'old pair(s)')
