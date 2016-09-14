@@ -73,6 +73,8 @@ def main():
     new_files_land = filter(new_files, 'land')
     new_files_port = filter(new_files, 'port')
     print(len(new_files_land), 'new pair(s) will be compared with', len(old_files_land), 'old pair(s)')
+    for f in new_files_land:
+        print(f)
     print('Building confusion matrix...')
     confusion_matrix = build_confusionmatrix(img_path, new_files_land, old_files_land)
     print('Arranging files in the folder...')
