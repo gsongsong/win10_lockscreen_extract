@@ -3,6 +3,7 @@ from PIL import Image
 import git
 from git import Repo
 import func
+import datetime
 
 
 def main():
@@ -78,14 +79,18 @@ $(function() {
 
     repo = Repo(git_path)
     repo.git.add('.')
+    log_file = open('git_log', 'a')
+    log_file.write(datetime.datetime.now().isoformat(' ') + '\n')
     try:
         repo.git.commit('-m updated')
     except git.exc.GitCommandError:
         print('Nothing to commit. Exit.')
+        log_file.write('Nothing to commit\n')
         exit()
     else:
         origin = repo.remote('origin')
         origin.push()
+        log_file.write('Pushed commit\n')
 
 if __name__ == "__main__":
     main()
