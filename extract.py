@@ -26,6 +26,7 @@ def main():
         print('Destination folder does not exist. Create new one.')
         os.mkdir(dst_path)
     copied_files = [f for f in os.listdir(dst_path) if f.endswith('.jpg')]
+    copied_files += [f for f in os.listdir(dst_path + 'dups/') if f.endswith('.jpg')]
 
     list_files = os.listdir(src_path)
     cnt = 0
