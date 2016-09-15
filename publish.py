@@ -32,6 +32,9 @@ def main():
         im.save(thumb_path + fname, 'JPEG')
         thumb_files += [fname]
 
+    # TODO: need to make more elegant
+    thumb_files = [f for f in os.listdir(src_path) if f.endswith('.jpg')]
+
     html_file = open(git_path + 'index.html', 'w')
     html_file.write('''<head>
 <title>Windows 10 Lockscreens</title>
