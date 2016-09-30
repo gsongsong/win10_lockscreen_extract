@@ -6,18 +6,22 @@ import func
 import datetime
 
 
-def main():
+def main(logfile=None):
     func.check_os()
+
+    if logfile is not None:
+        logfile = open(logfile, 'a')
+
     git_path = os.path.expanduser('~/Pictures/win10_lockscreen/')
     src_path = git_path + 'images/'
     if not os.path.isdir(src_path):
-        print('Repository does not exist. Exit.')
+        func.logwrite(logfile, 'Repository does not exist. Exit.\n')
         exit()
     original_files = [f for f in os.listdir(src_path) if f.endswith('.jpg')]
 
     thumb_path = git_path + 'thumbnails/'
     if not os.path.isdir(thumb_path):
-        print('Thumbnail folder does not exist. Create new one.')
+        func.logwrite(logfile, 'Thumbnail folder does not exist. Create new one.\n')
         os.mkdir(thumb_path)
     thumb_files = [f for f in os.listdir(thumb_path) if f.endswith('.jpg')]
 
@@ -82,18 +86,19 @@ $(function() {
 
     repo = Repo(git_path)
     repo.git.add('.')
-    log_file = open('git_log', 'a')
-    log_file.write(datetime.datetime.now().isoformat(' ') + '\n')
+    # log_file = open('git_log', 'a')
     try:
         repo.git.commit('-m updated')
     except git.exc.GitCommandError:
-        print('Nothing to commit. Exit.')
-        log_file.write('Nothing to commit\n')
+        func.logwrite(logfile, 'Nothing to commit. Exit.\n')
         exit()
     else:
         origin = repo.remote('origin')
         origin.push()
-        log_file.write('Pushed commit\n')
+        func.logwrite(logfile, 'Pushed commit\n')
+
+    if logfile is not None:
+        logfile.close()
 
 if __name__ == "__main__":
     main()

@@ -15,18 +15,28 @@ def check_already_copied(fname, copied_files):
     return False
 
 
-def main():
+def main(logfile=None):
     func.check_os()
+
+    if logfile is not None:
+        logfile = open(logfile, 'a')
 
     # APPDATA = os.getenv('APPDATA') # ApppData/Roaming
     src_path = os.path.expanduser('~/AppData/Local/Packages/Microsoft.Windows.ContentDeliveryManager_cw5n1h2txyewy/'
                                   'LocalState/Assets/')
     dst_path = os.path.expanduser('~/Pictures/win10_lockscreen/images/')
     if not os.path.isdir(dst_path):
-        print('Destination folder does not exist. Create new one.')
+        func.logwrite(logfile, 'Destination folder does not exist. Create new one.\n')
         os.mkdir(dst_path)
-    copied_files = [f for f in os.listdir(dst_path) if f.endswith('.jpg')]
-    copied_files += [f for f in os.listdir(dst_path + 'dups/') if f.endswith('.jpg')]
+    genuine_files = [f for f in os.listdir(dst_path) if f.endswith('.jpg')]
+    func.logwrite(logfile, 'Genuine files\n')
+    for f in genuine_files:
+        func.logwrite(logfile, '  ' + f + '\n')
+    dup_files = [f for f in os.listdir(dst_path + 'dups/') if f.endswith('.jpg')]
+    func.logwrite(logfile, 'Duplicated files\n')
+    for f in dup_files:
+        func.logwrite(logfile, '  ' + f + '\n')
+    copied_files = genuine_files + dup_files
 
     list_files = os.listdir(src_path)
     cnt = 0
@@ -45,9 +55,13 @@ def main():
                 list_land += [fname]
             if x == 1080 and y == 1920:
                 list_port += [fname]
-    print('Following new items will be copied:')
-    print('Landscape:', list_land)
-    print('Portrait: ', list_port)
+    func.logwrite(logfile, 'Following new items will be copied\n')
+    func.logwrite(logfile, '  Landscape\n')
+    for f in list_land:
+        func.logwrite(logfile, '    ' + f + '\n')
+    func.logwrite(logfile, '  Portrait\n')
+    for f in list_port:
+        func.logwrite(logfile, '    ' + f + '\n')
 
     err_all = []
     for land in list_land:
@@ -60,6 +74,7 @@ def main():
             err += [np.sum((im_land - im_port) ** 2) / (608 * 1080)]
         err_all += [np.array(err)]
 
+    func.logwrite(logfile, 'Match result\n')
     while True:
         n = len(list_land)
         m = len(list_port)
@@ -67,19 +82,22 @@ def main():
             break
 
         (arg_land, arg_port) = np.unravel_index(np.argmin(err_all), (n, m))
+        func.logwrite(logfile, '  land: ' + list_land[arg_land] + ', port: ' + list_port[arg_port] + '\n')
         shutil.copyfile(src_path + list_land[arg_land],
                         dst_path + list_land[arg_land] + '-land-' + list_port[arg_port] + '.jpg')
         shutil.copyfile(src_path + list_port[arg_port],
                         dst_path + list_land[arg_land] + '-port-' + list_port[arg_port] + '.jpg')
-        print(list_land[arg_land])
-        print(list_port[arg_port])
         cnt += 1
 
         del list_land[arg_land], list_port[arg_port]
         err_all = np.delete(err_all, arg_land, 0)
         err_all = np.delete(err_all, arg_port, 1)
 
-    print('Copied', cnt, 'pair(s)')
+    func.logwrite(logfile, 'Copied ' + str(cnt) + 'pair(s)\n')
+
+    if logfile is not None:
+        logfile.close()
+
     return cnt
 
 if __name__ == "__main__":

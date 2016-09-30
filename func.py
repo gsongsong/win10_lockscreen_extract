@@ -10,3 +10,8 @@ def check_os():
     if platform.release() != '10':
         print(err_msg)
         exit()
+
+
+def logwrite(logfile, message):
+    if logfile is not None:
+        logfile.write(message)

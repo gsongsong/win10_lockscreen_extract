@@ -43,7 +43,8 @@ def build_confusionmatrix(path, new_files, old_files):
     return confusion_matrix
 
 
-def arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land, old_files_port, confusion_matrix):
+def arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land, old_files_port, confusion_matrix,
+                       logfile=None):
     files_all_land = new_files_land + old_files_land
     files_all_port = new_files_port + old_files_port
     for idx1, file_land1 in enumerate(new_files_land):
@@ -54,31 +55,47 @@ def arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land,
         if confusion_matrix[idx1, n] > 0.98:
             size1 = os.path.getsize(img_path + file_land1)
             size2 = os.path.getsize(img_path + file_land2)
-            smaller_file_land = file_land1 if size1 < size2 else file_land2
-            smaller_file_port = file_port1 if size1 < size2 else file_port2
+            smaller_file_land, larger_file_land = (file_land1, file_land2) if size1 < size2 else (file_land2, file_land1)
+            smaller_file_port, larger_file_port = (file_port1, file_port2) if size1 < size2 else (file_port2, file_port1)
+            func.logwrite(logfile, '  ' + larger_file_land + ' wins ' + smaller_file_land + '\n')
             shutil.move(img_path + smaller_file_land, img_path + 'dups/' + smaller_file_land)
             shutil.move(img_path + smaller_file_port, img_path + 'dups/' + smaller_file_port)
 
 
-def main():
+def main(logfile=None):
     func.check_os()
+
+    if logfile is not None:
+        logfile = open(logfile, 'a')
+
     path = os.path.expanduser('~/Pictures/win10_lockscreen/')
     img_path = path + 'images/'
 
     repo = git.Repo(path)
+    # staged files
     old_files = [e[0][7:] for e in repo.index.entries if e[0].startswith('images/') and e[0].endswith('.jpg')]
     old_files_land = filter(old_files, 'land')
     old_files_port = filter(old_files, 'port')
+    func.logwrite(logfile, 'Staged files\n')
+    for f in old_files_land:
+        func.logwrite(logfile, '  ' + f + '\n')
+    # untracked files
     new_files = [f[7:] for f in repo.untracked_files if f.startswith('images/') and f.endswith('.jpg')]
     new_files_land = filter(new_files, 'land')
     new_files_port = filter(new_files, 'port')
-    print(len(new_files_land), 'new pair(s) will be compared with', len(old_files_land), 'old pair(s)')
+    func.logwrite(logfile, 'Untracked files\n')
     for f in new_files_land:
-        print(f)
-    print('Building confusion matrix...')
+        func.logwrite(logfile, '  ' + f + '\n')
+    func.logwrite(logfile, str(len(new_files_land)) + ' new pair(s) will be compared with ' +
+                  str(len(old_files_land)) + ' old pair(s)\n')
+    func.logwrite(logfile, 'Building confusion matrix...\n')
     confusion_matrix = build_confusionmatrix(img_path, new_files_land, old_files_land)
-    print('Arranging files in the folder...')
-    arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land, old_files_port, confusion_matrix)
+    func.logwrite(logfile, 'Arranging files in the folder...\n')
+    arrange_duplicates(img_path, new_files_land, new_files_port, old_files_land, old_files_port, confusion_matrix,
+                       logfile)
+
+    if logfile is not None:
+        logfile.close()
 
 if __name__ == "__main__":
     main()
