@@ -9,19 +9,17 @@ import shutil
 import util
 
 
-def initialize(repo_path, logger: logging.Logger):
+def initialize(img_path, logger: logging.Logger):
     logger.info('Initializing directories...')
 
-    if not os.path.isdir(repo_path):
-        logger.info('{0} does not exists. Creating it...'.format(repo_path))
-        os.mkdir(repo_path)
+    if not os.path.isdir(img_path):
+        logger.info('{0} does not exists. Creating it...'.format(img_path))
+        os.mkdir(img_path)
 
-    if not os.path.isdir(repo_path + 'dups/'):
+    if not os.path.isdir(img_path + 'dups/'):
         logger.info('{0} does not exists. Creating it...'
-                    .format(repo_path + 'dups/'))
-        os.mkdir(repo_path + 'dups/')
-
-    return repo_path
+                    .format(img_path + 'dups/'))
+        os.mkdir(img_path + 'dups/')
 
 
 def get_extracted_files(dst_path, logger: logging.Logger):
@@ -149,7 +147,7 @@ def extract(config: configparser.ConfigParser):
     # TODO: need to check branch
     repo_path, branch = util.get_conf_repoinfo(config)
     img_path = util.get_conf_imgpath(config)
-    initialize(repo_path, logger=logger)
+    initialize(img_path, logger=logger)
     extracted_files = get_extracted_files(repo_path, logger=logger)
     list_land, list_port = extract_files(src_path, extracted_files,
                                          logger=logger)
