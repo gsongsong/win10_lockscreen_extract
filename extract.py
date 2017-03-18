@@ -147,7 +147,7 @@ def extract(config: configparser.ConfigParser):
 
     src_path = util.get_conf_srcpath(config)
     # TODO: need to check branch
-    repo_path = util.get_conf_repoinfo(config)
+    repo_path, branch = util.get_conf_repoinfo(config)
     img_path = util.get_conf_imgpath(config)
     initialize(repo_path, logger=logger)
     extracted_files = get_extracted_files(repo_path, logger=logger)
