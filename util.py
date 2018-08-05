@@ -17,8 +17,8 @@ def check_os(logger: logging.Logger):
 
 def get_conf_logfile(config: configparser.ConfigParser, default='log'):
     if config.has_section('Log'):
-        if config.has_option('Log', 'level'):
-            return config.get('Log', 'level')
+        if config.has_option('Log', 'file'):
+            return config.get('Log', 'file')
     return default
 
 
