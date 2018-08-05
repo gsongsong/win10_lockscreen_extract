@@ -1,6 +1,7 @@
 import configparser
 import logging
 import os
+from pathlib import Path
 import platform
 import sys
 
@@ -34,16 +35,16 @@ def get_conf_loglevel(config: configparser.ConfigParser,
 
 def get_conf_repoinfo(config: configparser.ConfigParser):
     repopath = os.path.expanduser(config.get('Publish', 'path'))
-    return repopath, config.get('Publish', 'branch')
+    return Path(repopath), Path(config.get('Publish', 'branch'))
 
 
 def get_conf_srcpath(config: configparser.ConfigParser):
-    return os.path.expanduser(config.get('Directory', 'src'))
+    return Path(os.path.expanduser(config.get('Directory', 'src')))
 
 
 def get_conf_imgpath(config: configparser.ConfigParser):
-    return os.path.expanduser(config.get('Publish', 'path') + 'images/')
+    return Path(os.path.expanduser(config.get('Publish', 'path'))) / 'images/'
 
 
 def get_conf_thumbpath(config: configparser.ConfigParser):
-    return os.path.expanduser(config.get('Publish', 'path') + 'thumbnails/')
+    return Path(os.path.expanduser(config.get('Publish', 'path'))) / 'thumbnails/'

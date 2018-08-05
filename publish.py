@@ -28,7 +28,7 @@ def generate_thumbnails(thumb_path, img_path):
 
 
 def generate_html(repo_path, thumb_files):
-    html_file = open(repo_path + 'index.html', 'w')
+    html_file = open(repo_path / 'index.html', 'w')
     html_file.write('''
 <html>
     <head>

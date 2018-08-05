@@ -16,17 +16,17 @@ def initialize(img_path, logger: logging.Logger):
         logger.info('{0} does not exists. Creating it...'.format(img_path))
         os.mkdir(img_path)
 
-    if not os.path.isdir(img_path + 'dups/'):
+    if not os.path.isdir(img_path / 'dups/'):
         logger.info('{0} does not exists. Creating it...'
-                    .format(img_path + 'dups/'))
-        os.mkdir(img_path + 'dups/')
+                    .format(img_path / 'dups/'))
+        os.mkdir(img_path / 'dups/')
 
 
 def get_extracted_files(dst_path, logger: logging.Logger):
     logger.info('Getting list of already extracted files...')
 
     published_files = [f for f in os.listdir(dst_path) if f.endswith('.jpg')]
-    dup_files = [f for f in os.listdir(dst_path + 'dups/')if f.endswith('.jpg')]
+    dup_files = [f for f in os.listdir(dst_path / 'dups/')if f.endswith('.jpg')]
 
     return published_files + dup_files
 
@@ -148,7 +148,7 @@ def extract(config: configparser.ConfigParser):
     repo_path, branch = util.get_conf_repoinfo(config)
     img_path = util.get_conf_imgpath(config)
     initialize(img_path, logger=logger)
-    extracted_files = get_extracted_files(repo_path, logger=logger)
+    extracted_files = get_extracted_files(img_path, logger=logger)
     list_land, list_port = extract_files(src_path, extracted_files,
                                          logger=logger)
     difference_matrix = build_differencematrix(src_path, list_land, list_port,
